@@ -1,0 +1,31 @@
+{
+  "name": "kiciti-core",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The backbone of the Kiciti app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Teepee78/kiciti-core.git"
+  },
+  "keywords": [],
+  "author": "Toluwalase Phillips <eniolatoluwalase78@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Teepee78/kiciti-core/issues"
+  },
+  "homepage": "https://github.com/Teepee78/kiciti-core#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "joi": "^17.7.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.8.0"
+  }
+}
