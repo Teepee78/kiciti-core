@@ -23,7 +23,9 @@ async function validateAccount(req, res, next) {
   });
 
   // Convert values to lowercase and trim
-  req.body.username = req.body.username.toLowerCase().trim();
+  if (req.body.hasOwnProperty("username")) {
+    req.body.username = req.body.username.toLowerCase().trim();
+  }
   req.body.first_name = req.body.first_name.toLowerCase().trim();
   if (req.body.hasOwnProperty("middle_name")) {
     req.body.middle_name = req.body.middle_name.toLowerCase().trim();
