@@ -35,7 +35,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification, { explorer: true }));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification, { explorer: true }));
 app.use(cookieParser());
 app.use(logger);
 
