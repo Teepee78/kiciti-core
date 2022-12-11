@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://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@github.com/Teepee78/kiciti-core.git"
+    "url": "git+https://github.com/Teepee78/kiciti-core.git"
   },
   "keywords": [],
   "author": "Toluwalase Phillips <eniolatoluwalase78@gmail.com>",
@@ -21,11 +21,14 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "joi": "^17.7.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "mongoose": "^6.8.0"
+    "mongoose": "^6.8.0",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.6.0"
   }
 }

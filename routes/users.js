@@ -7,7 +7,54 @@ import _ from "lodash";
 let router = Router();
 
 
-// Create a new user
+/**
+ * @openapi
+ *
+ * /api/users/create:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               first_name:
+ *                 type: string
+ *               middle_name:
+ *                 type: string
+ *               surname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *               gender:
+ *                 type: string
+ *                 enum:
+ *                  - male
+ *                  - female
+ *             required:
+ *               - username
+ *               - first_name
+ *               - surname
+ *               - email
+ *               - password
+ *               - dob
+ *               - gender
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "400":
+ *         description: Bad Request
+ */
 router.post('/create', validateAccount, async (req, res) => {
   try {
     // Get user object values
