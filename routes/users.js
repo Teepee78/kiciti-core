@@ -10,7 +10,7 @@ let router = Router();
 /**
  * @openapi
  *
- * /api/users/create:
+ * /api/users/signup:
  *   post:
  *     summary: Create a new user
  *     tags: [Users]
@@ -36,6 +36,8 @@ let router = Router();
  *               dob:
  *                 type: string
  *                 format: date
+ *               country:
+ *                 type: string
  *               gender:
  *                 type: string
  *                 enum:
@@ -55,7 +57,7 @@ let router = Router();
  *       "400":
  *         description: Bad Request
  */
-router.post('/create', validateAccount, async (req, res) => {
+router.post('/signup', validateAccount, async (req, res) => {
   try {
     // Get user object values
     let userObject = _.omit(req.body, "password");

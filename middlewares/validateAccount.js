@@ -9,6 +9,7 @@ const createSchema = Joi.object({
   email: Joi.string().email().lowercase().required(),
   password: Joi.string().min(4).required(),
   dob: Joi.date().required(),
+  country: Joi.string().required(),
   gender: Joi.string().valid("male", "female").required(),
 });
 
@@ -20,6 +21,18 @@ async function validateAccount(req, res, next) {
     message: result.error.details[0].message,
     data: req.body
   });
+
+  // Convert values to lowercase and trim
+  req.body.username = req.body.username.toLowerCase().trim();
+  req.body.first_name = req.body.first_name.toLowerCase().trim();
+  if (req.body.hasOwnProperty("middle_name")) {
+    req.body.middle_name = req.body.middle_name.toLowerCase().trim();
+  }
+  req.body.surname = req.body.surname.toLowerCase().trim();
+  req.body.email = req.body.email.toLowerCase().trim();
+  req.body.country = req.body.country.toLowerCase().trim();
+  req.body.gender = req.body.gender.toLowerCase().trim();
+
 
   next();
 };

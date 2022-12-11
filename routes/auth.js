@@ -11,7 +11,7 @@ let router = Router();
  *
  * /api/login:
  *   post:
- *     summary: Login a user
+ *     summary: Log in a user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
