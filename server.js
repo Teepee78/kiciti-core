@@ -19,3 +19,7 @@ app.listen(process.env.KICITI_PORT, (error) => {
   if (!error) return console.log("Starting server on port 3000...");
   console.log(error);
 });
+
+
+// export app for vercel
+export default app;
