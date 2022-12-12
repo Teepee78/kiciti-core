@@ -107,8 +107,6 @@ router.post('/signup', validateAccount, async (req, res) => {
  *         description: OK
  *       "400":
  *         description: Bad Request
- *       "404":
- *         description: Not Found
  */
 router.get('/:user_id', authenticate, async (req, res) => {
   try {
