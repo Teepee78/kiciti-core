@@ -1,5 +1,6 @@
 import Router from 'express';
 import validateAccount from '../middlewares/validateAccount.js';
+import authenticate from '../middlewares/auth.js';
 import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import _ from "lodash";
@@ -76,7 +77,43 @@ router.post('/signup', validateAccount, async (req, res) => {
 
     // Get json web token and store in cookie
     const token = user.generateAuthToken();
-    res.cookie("X-auth-token", token, { expire: new Date() + 10 });
+    res.cookie("X-auth-token", token);
+
+    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v" ]));
+  }
+  catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+
+/**
+ * @openapi
+ *
+ * /api/users/{user_id}:
+ *   get:
+ *     summary: Get information about a user for profile page
+ *     tags: [Users]
+ *     parameters:
+ *      - in: path
+ *        name: user_id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: id of user (string)
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "400":
+ *         description: Bad Request
+ *       "404":
+ *         description: Not Found
+ */
+router.get('/:user_id', authenticate, async (req, res) => {
+  try {
+    // Get user by id
+    let user = await User.findById(req.params.user_id);
 
     res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v" ]));
   }

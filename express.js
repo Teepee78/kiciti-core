@@ -33,10 +33,11 @@ const app = express();
 
 // middlewares
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification, { explorer: true }));
-app.use(cookieParser());
+
 app.use(logger);
 
 // routes
