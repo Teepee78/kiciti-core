@@ -63,6 +63,61 @@ router.post("/", authenticate, async (req, res) => {
 /**
  * @openapi
  *
+ * /api/posts/:
+ *   get:
+ *     summary: Get all posts
+ *     tags: [Posts]
+ *     parameters:
+ *      - in: query
+ *        name: page
+ *        schema:
+ *           type: integer
+ *        description: The page number
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: integer
+ *        description: The number of items to return
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "404":
+ *         description: Not found
+ */
+router.get("/", async (req, res) => {
+  try {
+    // Get page and limit
+    const { page = 1, limit = 20 } = req.query;
+
+    // Get Posts
+    let posts =  await Post.find().limit(limit).skip((page - 1) * limit).exec();
+    // Parse result
+    let result = [];
+    Object.values(posts).forEach(post => {
+      result.push(_.omit(post.toObject(), [ "__v" ]));
+    });
+
+    // get total documents in the Posts collection 
+    const count = await Post.countDocuments();
+
+    res.json({
+      status: "OK",
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      limit: limit,
+      posts: result
+    });
+  }
+  catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+
+/**
+ * @openapi
+ *
  * /api/posts/{user_id}:
  *   get:
  *     summary: Get all posts for a user
@@ -95,6 +150,45 @@ router.get('/:user_id', authenticate, async (req, res) => {
     res.json({
       status: "OK",
       posts: posts
+    });
+  }
+  catch (error) {
+    console.error(error);
+    res.status(403).json({ message: error.message });
+  }
+});
+
+/**
+ * @openapi
+ *
+ * /api/posts/post/{post_id}:
+ *   get:
+ *     summary: Get a particular post by id
+ *     tags: [Posts]
+ *     parameters:
+ *      - in: path
+ *        name: post_id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: id of post (string)
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "400":
+ *         description: Bad Request
+ *       "404":
+ *         description: Not Found
+ */
+router.get('/post/:post_id', async (req, res) => {
+  try {
+    // Get post by id
+    let post = await Post.findById(req.params.post_id);
+    if (!post) return res.status(404).json({message: "Post not found"})
+
+    res.json({
+      status: "OK",
+      post: post
     });
   }
   catch (error) {
