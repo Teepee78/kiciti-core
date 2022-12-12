@@ -4,6 +4,7 @@ import cors from 'cors';
 // import routes
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
+import postsRouter from "./routes/posts.js";
 
 // import custom middlewares
 import logger from "./middlewares/logger.js";
@@ -43,6 +44,7 @@ app.use(logger);
 // routes
 app.use("/api/users", usersRouter);
 app.use("/api", authRouter);
+app.use("/api/posts", postsRouter);
 
 // export app
 export default app;

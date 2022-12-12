@@ -5,7 +5,7 @@ import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import _ from "lodash";
 
-let router = Router();
+const router = Router();
 
 
 /**
@@ -79,7 +79,7 @@ router.post('/signup', validateAccount, async (req, res) => {
     const token = user.generateAuthToken();
     res.cookie("X-auth-token", token);
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v" ]));
+    res.json(_.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]));
   }
   catch (error) {
     console.error(error);
@@ -113,7 +113,7 @@ router.get('/:user_id', authenticate, async (req, res) => {
     // Get user by id
     let user = await User.findById(req.params.user_id);
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v" ]));
+    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]));
   }
   catch (error) {
     console.error(error);

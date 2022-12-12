@@ -3,7 +3,7 @@ import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import _ from "lodash";
 
-let router = Router();
+const router = Router();
 
 
 /**
@@ -55,7 +55,7 @@ router.post('/login', async (req, res) => {
     const token = user.generateAuthToken();
     res.cookie("X-auth-token", token, { expire: new Date() + 10 });
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v" ]));
+    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]));
   }
   catch (error) {
     console.error(error);
