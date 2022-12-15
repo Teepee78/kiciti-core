@@ -28,7 +28,7 @@ const router = Router();
  *                 type: string
  *               middle_name:
  *                 type: string
- *               surname:
+ *               last_name:
  *                 type: string
  *               email:
  *                 type: string
@@ -47,7 +47,7 @@ const router = Router();
  *             required:
  *               - username
  *               - first_name
- *               - surname
+ *               - last_name
  *               - email
  *               - password
  *               - dob
