@@ -61,7 +61,10 @@ const userSchema =  new mongoose.Schema({
 
   phone_number: {
     type: String,
-    default: null
+    index: {
+      unique: true,
+      partialFilterExpression: { phone_number: { $type: 'string' } }
+    }
   },
 
   country: {
