@@ -80,8 +80,13 @@ router.post('/signup', validateAccount, async (req, res) => {
     res.cookie("X-auth-token", token);
     // Set cookie as header
     res.setHeader("X-auth-token", token);
+    // Set cookie in response
+    const response = {
+      "user": _.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]),
+      "X-auth-token": token
+    };
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]));
+    res.json(response);
   }
   catch (error) {
     console.error(error);

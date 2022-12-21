@@ -56,8 +56,13 @@ router.post('/login', async (req, res) => {
     res.cookie("X-auth-token", token, { expire: new Date() + 10 });
     // Set cookie as header
     res.setHeader("X-auth-token", token);
+    // Set cookie in response
+    const response = {
+      "user": _.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]),
+      "X-auth-token": token
+    };
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]));
+    res.json(response);
   }
   catch (error) {
     console.error(error);
