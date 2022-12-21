@@ -78,6 +78,8 @@ router.post('/signup', validateAccount, async (req, res) => {
     // Get json web token and store in cookie
     const token = user.generateAuthToken();
     res.cookie("X-auth-token", token);
+    // Set cookie as header
+    res.setHeader("X-auth-token", token);
 
     res.json(_.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]));
   }
