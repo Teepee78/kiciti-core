@@ -128,4 +128,82 @@ router.get('/:user_id', authenticate, async (req, res) => {
   }
 });
 
+/**
+ * @openapi
+ *
+ * /api/users/{user_id}:
+ *   put:
+ *     summary: Update a user's profile
+ *     tags: [Users]
+ *     parameters:
+ *      - in: path
+ *        name: user_id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: id of user (string)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               first_name:
+ *                 type: string
+ *               middle_name:
+ *                 type: string
+ *               last_name:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *             required:
+ *               - username
+ *               - first_name
+ *               - last_name
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "400":
+ *         description: Bad Request
+ */
+router.put('/:user_id', authenticate, async (req, res) => {
+  try {
+    // Get user object values
+    let userObject = req.body;
+
+    // Get user from database
+    let user = await User.findById(req.params.user_id);
+    if (!user) return res.status(400).json({ message: "User does not exist" });
+
+    // Check that first_name and last_name are provided
+    if (!("first_name" in userObject) || !("last_name" in userObject)) return res.status(400).json({ message: "first_name and last_name are required"});
+
+    // Update user
+    if (user.username != userObject.username) user.username = userObject.username;
+    if (user.first_name != userObject.first_name) user.first_name = userObject.first_name;
+    if (user.last_name != userObject.last_name) user.last_name = userObject.last_name;
+    if (userObject.middle_name) user.middle_name = userObject.middle_name;
+    if (userObject.phone_number) user.phone_number = userObject.phone_number;
+    if (userObject.country) user.country = userObject.country;
+    await user.save();
+
+    // Return updated user
+    const response = {
+      "user": _.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]),
+      "message": "User updated successfully"
+    };
+
+    res.json(response);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
 export default router;
