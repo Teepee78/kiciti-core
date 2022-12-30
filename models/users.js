@@ -78,6 +78,10 @@ const userSchema =  new mongoose.Schema({
     required: true
   },
 
+  pfp: {
+    type: String
+  },
+
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post"

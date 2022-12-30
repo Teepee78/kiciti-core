@@ -13,8 +13,8 @@ async function authenticate (req, res, next) {
   if (!user) return res.status(400).json({message: "User not logged in"});
 
   console.log("User logged in...")
-  // set user id in body
-  req.body._id = user._id;
+  // set user id in request object
+  req.user_id = user._id;
 
   next();
 }
