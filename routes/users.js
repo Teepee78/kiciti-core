@@ -295,7 +295,8 @@ router.post('/:user_id/pfp', upload.single('pfp'), async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.get('/:user_id/pfp', authenticate, async (req, res) => {
+// router.get('/:user_id/pfp', authenticate, async (req, res) => {
+router.get('/:user_id/pfp', async (req, res) => {
   try {
     // Get user by id
     let user = await User.findById(req.params.user_id);
