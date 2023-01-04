@@ -237,7 +237,8 @@ router.put('/:user_id', authenticate, async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.post('/:user_id/pfp', [ authenticate, upload.single('pfp') ], async (req, res) => {
+// router.post('/:user_id/pfp', [ authenticate, upload.single('pfp') ], async (req, res) => {
+router.post('/:user_id/pfp', upload.single('pfp'), async (req, res) => {
   try {
     // Confirm that signed in user is the one setting their pfp
     if (req.params.user_id !== req.user_id) {
