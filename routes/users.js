@@ -241,9 +241,9 @@ router.put('/:user_id', authenticate, async (req, res) => {
 router.post('/:user_id/pfp', upload.single('pfp'), async (req, res) => {
   try {
     // Confirm that signed in user is the one setting their pfp
-    if (req.params.user_id !== req.user_id) {
-      res.status(403).json({ message: 'forbidden' });
-    }
+    // if (req.params.user_id !== req.user_id) {
+    //   res.status(403).json({ message: 'forbidden' });
+    // }
     // Get user by id
     let user = await User.findById(req.params.user_id);
 
