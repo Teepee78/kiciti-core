@@ -6,7 +6,8 @@ async function authenticate (req, res, next) {
   console.log("\nAuthenticating User...");
   // check for jwt
   if (req.cookies["X-auth-token"] === undefined && req.headers['X-auth-token'] === undefined) {
-    console.log("Here 1");
+    console.log(req.cookies);
+    console.log(req.headers);
     return res.status(400).json({message: "User not logged in"});
   }
   // verify user is signed in
