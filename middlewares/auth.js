@@ -9,10 +9,11 @@ async function authenticate (req, res, next) {
     return res.status(400).json({message: "User not logged in"});
   }
   // verify user is signed in
+  let user;
   try {
-    let user = jwt.verify(req.cookies["X-auth-token"], process.env.KICITI_JWT);
+    user = jwt.verify(req.cookies["X-auth-token"], process.env.KICITI_JWT);
   } catch (e) {
-    let user = jwt.verify(req.headers["x-auth-token"], process.env.KICITI_JWT);
+    user = jwt.verify(req.headers["x-auth-token"], process.env.KICITI_JWT);
     if (!user) return res.status(400).json({message: "User not logged in"});
   }
 
