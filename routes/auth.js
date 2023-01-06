@@ -1,10 +1,9 @@
-import Router from 'express';
+import Router from "express";
 import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import _ from "lodash";
 
 const router = Router();
-
 
 /**
  * @openapi
@@ -32,7 +31,7 @@ const router = Router();
  *       "400":
  *         description: Bad Request
  */
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     // Get user input
     let userInput = req.body.user;
@@ -40,16 +39,16 @@ router.post('/login', async (req, res) => {
 
     // Get user
     // Check if user email exists
-    let user = await User.findOne({email: userInput});
+    let user = await User.findOne({ email: userInput });
     if (!user) {
       // Check if username exists
-      user = await User.findOne({username: userInput});
-      if (!user) return res.status(400).json({message: "Incorrect details"});
-	  }
+      user = await User.findOne({ username: userInput });
+      if (!user) return res.status(400).json({ message: "Incorrect details" });
+    }
 
     // Check that password is correct
     let correct = await bcrypt.compare(password, user.password);
-    if (!correct) return res.status(400).json({message: "Incorrect details"});
+    if (!correct) return res.status(400).json({ message: "Incorrect details" });
 
     // Get json web token and store in cookie
     const token = user.generateAuthToken();
@@ -58,13 +57,18 @@ router.post('/login', async (req, res) => {
     res.setHeader("X-auth-token", token);
     // Set cookie in response
     const response = {
-      "user": _.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]),
-      "X-auth-token": token
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "likes",
+        "created_at",
+        "__v",
+      ]),
+      "X-auth-token": token,
     };
 
     res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }

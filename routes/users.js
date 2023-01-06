@@ -334,6 +334,15 @@ router.get("/:user_id/pfp", authenticate, async (req, res) => {
 
     // Download image and send to frontend
     let pfp = await downloadPfp(req.params.user_id);
+    // let image = new Buffer(pfp.Body).toString('base64');
+    // image = "data:" + pfp.ContentType + ";base64," + image;
+    // res.header('Content-Type', pfp.ContentType);
+    // res.header("Access-Control-Allow-Origin", "*");
+    // let response = {
+    //   "body": image,
+    //   "isBase64Encoded": true
+    // };
+    // res.status(200).send(image);
 
     res.writeHead(200, { "Content-Type": "image/jpeg" });
     res.write(pfp.Body, "binary");
@@ -391,6 +400,80 @@ router.delete("/:user_id/pfp", authenticate, async (req, res) => {
         "likes",
       ]),
     });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+/**
+ * @openapi
+ *
+ * /api/users/{user_id}/password:
+ *   put:
+ *     summary: Update a user's password
+ *     tags: [Users]
+ *     parameters:
+ *      - in: path
+ *        name: user_id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: id of user (string)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               old_password:
+ *                 type: string
+ *               new_password:
+ *                 type: string
+ *             required:
+ *               - old_password
+ *               - new_password
+ *     responses:
+ *       "200":
+ *         description: OK
+ *       "400":
+ *         description: Bad Request
+ */
+router.put("/:user_id/password", authenticate, async (req, res) => {
+  try {
+    // Get user password values
+    let userObject = req.body;
+
+    // Get user from database
+    let user = await User.findById(req.params.user_id);
+    if (!user) return res.status(400).json({ message: "User does not exist" });
+
+    // Check that old password is correct
+    let correct = await bcrypt.compare(userObject.old_password, user.password);
+    if (!correct) return res.status(400).json({ message: "Incorrect details" });
+
+    // hash new password
+    let salt = await bcrypt.genSalt(10);
+    userObject.password = await bcrypt.hash(userObject.new_password, salt);
+
+    // Update user password
+    user.password = userObject.password;
+    await user.save();
+
+    // Return updated user
+    const response = {
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "created_at",
+        "__v",
+        "likes",
+      ]),
+      message: "password updated successfully",
+    };
+
+    res.json(response);
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
