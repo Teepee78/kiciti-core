@@ -1,16 +1,15 @@
-import Router from 'express';
-import validateAccount from '../middlewares/validateAccount.js';
-import authenticate from '../middlewares/auth.js';
+import Router from "express";
+import validateAccount from "../middlewares/validateAccount.js";
+import authenticate from "../middlewares/auth.js";
 import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import _ from "lodash";
-import multer from 'multer';
-import { uploadPfp, downloadPfp, deletePfp } from '../utilities/s3.js';
-import fs from 'fs';
+import multer from "multer";
+import { uploadPfp, downloadPfp, deletePfp } from "../utilities/s3.js";
+import fs from "fs";
 
 const router = Router();
-const upload = multer({ dest: './uploads' });
-
+const upload = multer({ dest: "./uploads" });
 
 /**
  * @openapi
@@ -62,14 +61,15 @@ const upload = multer({ dest: './uploads' });
  *       "400":
  *         description: Bad Request
  */
-router.post('/signup', validateAccount, async (req, res) => {
+router.post("/signup", validateAccount, async (req, res) => {
   try {
     // Get user object values
     let userObject = _.omit(req.body, "password");
 
     // Make sure user does not already exist
-    let user = await User.find({email: userObject.email});
-    if (user.length > 0) return res.status(400).json({ message: "User already exists" });
+    let user = await User.find({ email: userObject.email });
+    if (user.length > 0)
+      return res.status(400).json({ message: "User already exists" });
 
     // hash password
     let salt = await bcrypt.genSalt(10);
@@ -86,18 +86,22 @@ router.post('/signup', validateAccount, async (req, res) => {
     res.setHeader("X-auth-token", token);
     // Set cookie in response
     const response = {
-      "user": _.omit(user.toObject(), [ "password", "posts", "likes", "created_at", "__v" ]),
-      "X-auth-token": token
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "likes",
+        "created_at",
+        "__v",
+      ]),
+      "X-auth-token": token,
     };
 
     res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
 });
-
 
 /**
  * @openapi
@@ -119,14 +123,21 @@ router.post('/signup', validateAccount, async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.get('/:user_id', authenticate, async (req, res) => {
+router.get("/:user_id", authenticate, async (req, res) => {
   try {
     // Get user by id
     let user = await User.findById(req.params.user_id);
 
-    res.json(_.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]));
-  }
-  catch (error) {
+    res.json(
+      _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "created_at",
+        "__v",
+        "likes",
+      ])
+    );
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
@@ -175,7 +186,7 @@ router.get('/:user_id', authenticate, async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.put('/:user_id', authenticate, async (req, res) => {
+router.put("/:user_id", authenticate, async (req, res) => {
   try {
     // Get user object values
     let userObject = req.body;
@@ -185,12 +196,18 @@ router.put('/:user_id', authenticate, async (req, res) => {
     if (!user) return res.status(400).json({ message: "User does not exist" });
 
     // Check that first_name and last_name are provided
-    if (!("first_name" in userObject) || !("last_name" in userObject)) return res.status(400).json({ message: "first_name and last_name are required"});
+    if (!("first_name" in userObject) || !("last_name" in userObject))
+      return res
+        .status(400)
+        .json({ message: "first_name and last_name are required" });
 
     // Update user
-    if (user.username != userObject.username) user.username = userObject.username;
-    if (user.first_name != userObject.first_name) user.first_name = userObject.first_name;
-    if (user.last_name != userObject.last_name) user.last_name = userObject.last_name;
+    if (user.username != userObject.username)
+      user.username = userObject.username;
+    if (user.first_name != userObject.first_name)
+      user.first_name = userObject.first_name;
+    if (user.last_name != userObject.last_name)
+      user.last_name = userObject.last_name;
     if (userObject.middle_name) user.middle_name = userObject.middle_name;
     if (userObject.phone_number) user.phone_number = userObject.phone_number;
     if (userObject.country) user.country = userObject.country;
@@ -198,13 +215,18 @@ router.put('/:user_id', authenticate, async (req, res) => {
 
     // Return updated user
     const response = {
-      "user": _.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ]),
-      "message": "User updated successfully"
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "created_at",
+        "__v",
+        "likes",
+      ]),
+      message: "User updated successfully",
     };
 
     res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
@@ -237,43 +259,52 @@ router.put('/:user_id', authenticate, async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.post('/:user_id/pfp', [ authenticate, upload.single('pfp') ], async (req, res) => {
-// router.post('/:user_id/pfp', upload.single('pfp'), async (req, res) => {
-  try {
-    // Confirm that signed in user is the one setting their pfp
-    if (req.params.user_id !== req.user_id) {
-      res.status(403).json({ message: 'forbidden' });
+router.post(
+  "/:user_id/pfp",
+  [authenticate, upload.single("pfp")],
+  async (req, res) => {
+    // router.post('/:user_id/pfp', upload.single('pfp'), async (req, res) => {
+    try {
+      // Confirm that signed in user is the one setting their pfp
+      if (req.params.user_id !== req.user_id) {
+        res.status(403).json({ message: "forbidden" });
+      }
+      // Get user by id
+      let user = await User.findById(req.params.user_id);
+
+      // Upload image to bucket
+      let deets = await uploadPfp(user.id, req.file);
+
+      // Set image as user profile picture
+      user.pfp = `pfp-${user.id}.jpg`;
+      user.save();
+
+      // Delete image locally
+      fs.unlink("./uploads/" + req.file.filename, (err) => {
+        if (err) throw err;
+      });
+
+      res.status(201).json({
+        status: "success",
+        message: "Display picture set",
+        user: _.omit(user.toObject(), [
+          "password",
+          "posts",
+          "created_at",
+          "__v",
+          "likes",
+        ]),
+      });
+    } catch (error) {
+      // Delete image locally
+      fs.unlink("./uploads/" + req.file.filename, (err) => {
+        if (err) throw err;
+      });
+      console.error(error);
+      res.status(400).json({ message: error.message });
     }
-    // Get user by id
-    let user = await User.findById(req.params.user_id);
-
-    // Upload image to bucket
-    let deets = await uploadPfp(user.id, req.file);
-
-    // Set image as user profile picture
-    user.pfp = `pfp-${user.id}.jpg`;
-    user.save();
-
-    // Delete image locally
-    fs.unlink('./uploads/' + req.file.filename, (err) => {
-      if (err) throw err;
-    });
-
-    res.status(201).json({
-      'status': 'success',
-      'message': 'Display picture set',
-      'user': _.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ])
-    });
   }
-  catch (error) {
-    // Delete image locally
-    fs.unlink('./uploads/' + req.file.filename, (err) => {
-      if (err) throw err;
-    });
-    console.error(error);
-    res.status(400).json({ message: error.message });
-  }
-});
+);
 
 /**
  * @openapi
@@ -295,20 +326,19 @@ router.post('/:user_id/pfp', [ authenticate, upload.single('pfp') ], async (req,
  *       "400":
  *         description: Bad Request
  */
-router.get('/:user_id/pfp', authenticate, async (req, res) => {
-// router.get('/:user_id/pfp', async (req, res) => {
+router.get("/:user_id/pfp", authenticate, async (req, res) => {
+  // router.get('/:user_id/pfp', async (req, res) => {
   try {
     // Get user by id
     let user = await User.findById(req.params.user_id);
 
     // Download image and send to frontend
     let pfp = await downloadPfp(req.params.user_id);
-    
-    res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-    res.write(pfp.Body, 'binary');
-    res.end(null, 'binary');
-  }
-  catch (error) {
+
+    res.writeHead(200, { "Content-Type": "image/jpeg" });
+    res.write(pfp.Body, "binary");
+    res.end(null, "binary");
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
@@ -334,11 +364,11 @@ router.get('/:user_id/pfp', authenticate, async (req, res) => {
  *       "400":
  *         description: Bad Request
  */
-router.delete('/:user_id/pfp', authenticate, async (req, res) => {
+router.delete("/:user_id/pfp", authenticate, async (req, res) => {
   try {
     // Confirm that signed in user is the one deleting their pfp
     if (req.params.user_id !== req.user_id) {
-      res.status(403).json({ message: 'forbidden' })
+      res.status(403).json({ message: "forbidden" });
     }
     // Get user by id
     let user = await User.findById(req.params.user_id);
@@ -349,14 +379,19 @@ router.delete('/:user_id/pfp', authenticate, async (req, res) => {
     // Unset pfp in user schema
     user.pfp = null;
     user.save();
-    
+
     res.json({
-      'status': 'success',
-      'message': 'Display picture deleted successfully',
-      'user': _.omit(user.toObject(), [ "password", "posts", "created_at", "__v", "likes" ])
+      status: "success",
+      message: "Display picture deleted successfully",
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "created_at",
+        "__v",
+        "likes",
+      ]),
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
