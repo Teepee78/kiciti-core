@@ -34,12 +34,12 @@ const router = Router();
 router.post("/", authenticate, async (req, res) => {
   try {
     // Get user
-    let user = await User.findById(req.body.user_id);
+    let user = await User.findById(req.user_id);
 
     // Create post
     let post = await Post({
       content: req.body.content,
-      user_id: req.body.user_id
+      user_id: req.user_id
     });
     await post.save();
 
