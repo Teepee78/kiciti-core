@@ -44,7 +44,11 @@ router.post("/", authenticate, async (req, res) => {
     await post.save();
 
     // Add post id to user posts
-    user.posts.push(post._id);
+    if (user.posts === undefined) {
+      user.posts = [post._id];
+    } else {
+      user.posts.push(post._id);
+    }
     await user.save();
 
     res.json({
