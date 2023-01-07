@@ -33,6 +33,7 @@ const router = Router();
  */
 router.post("/", authenticate, async (req, res) => {
   try {
+    console.log(req.body);
     // Get user
     let user = await User.findById(req.body._id);
 
