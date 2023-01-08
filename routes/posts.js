@@ -89,19 +89,23 @@ router.post("/", authenticate, async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     // Get page and limit
-    const { page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 30 } = req.query;
 
     // Get Posts
     let posts = await Post.find()
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
+
     // Parse result
     let result = [];
-    Object.values(posts).forEach((post) => {
+    const posts_objects = Object.values(posts);
+    for (let post of posts_objects) {
+      const user = await User.findById(post.user_id.toString());
+      console.log(user);
       result.push({
         post: _.omit(post.toObject(), ["__v"]),
-        user: _.omit(User.findById(post.user_id), [
+        user: _.omit(user.toObject(), [
           "password",
           "posts",
           "created_at",
@@ -109,7 +113,7 @@ router.get("/", async (req, res) => {
           "likes",
         ]),
       });
-    });
+    }
 
     // get total documents in the Posts collection
     const count = await Post.countDocuments();
