@@ -39,7 +39,7 @@ router.post("/", authenticate, async (req, res) => {
     // Create post
     let post = await Post({
       content: req.body.content,
-      user_id: req.user_id
+      user_id: req.user_id,
     });
     await post.save();
 
@@ -54,15 +54,13 @@ router.post("/", authenticate, async (req, res) => {
     res.json({
       message: "Post created successfully!",
       status: "OK",
-      post: _.omit(post.toObject(), [ "__v"])
+      post: _.omit(post.toObject(), ["__v"]),
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
 });
-
 
 /**
  * @openapi
@@ -94,14 +92,26 @@ router.get("/", async (req, res) => {
     const { page = 1, limit = 20 } = req.query;
 
     // Get Posts
-    let posts =  await Post.find().limit(limit).skip((page - 1) * limit).exec();
+    let posts = await Post.find()
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
     // Parse result
     let result = [];
-    Object.values(posts).forEach(post => {
-      result.push(_.omit(post.toObject(), [ "__v" ]));
+    Object.values(posts).forEach((post) => {
+      result.push({
+        post: _.omit(post.toObject(), ["__v"]),
+        user: _.omit(User.findById(post.user_id), [
+          "password",
+          "posts",
+          "created_at",
+          "__v",
+          "likes",
+        ]),
+      });
     });
 
-    // get total documents in the Posts collection 
+    // get total documents in the Posts collection
     const count = await Post.countDocuments();
 
     res.json({
@@ -109,15 +119,13 @@ router.get("/", async (req, res) => {
       totalPages: Math.ceil(count / limit),
       currentPage: page,
       limit: limit,
-      posts: result
+      posts: result,
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
 });
-
 
 /**
  * @openapi
@@ -139,7 +147,7 @@ router.get("/", async (req, res) => {
  *       "403":
  *         description: Forbidden
  */
-router.get('/:user_id', authenticate, async (req, res) => {
+router.get("/:user_id", authenticate, async (req, res) => {
   try {
     // Get user by id
     let user = await User.findById(req.params.user_id);
@@ -153,10 +161,9 @@ router.get('/:user_id', authenticate, async (req, res) => {
 
     res.json({
       status: "OK",
-      posts: posts
+      posts: posts,
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(403).json({ message: error.message });
   }
@@ -184,22 +191,20 @@ router.get('/:user_id', authenticate, async (req, res) => {
  *       "404":
  *         description: Not Found
  */
-router.get('/post/:post_id', async (req, res) => {
+router.get("/post/:post_id", async (req, res) => {
   try {
     // Get post by id
     let post = await Post.findById(req.params.post_id);
-    if (!post) return res.status(404).json({message: "Post not found"})
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
     res.json({
       status: "OK",
-      post: post
+      post: post,
     });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(400).json({ message: error.message });
   }
 });
-
 
 export default router;
