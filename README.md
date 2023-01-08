@@ -76,5 +76,3 @@ Here is our live demo. Please take a tour of the deployed site...
 
 # License
 MIT
-
-Thank you for reading. Enjoy~
