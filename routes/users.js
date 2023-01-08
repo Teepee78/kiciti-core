@@ -208,8 +208,13 @@ router.put("/:user_id", authenticate, async (req, res) => {
       user.first_name = userObject.first_name;
     if (user.last_name != userObject.last_name)
       user.last_name = userObject.last_name;
+
     if (userObject.middle_name) user.middle_name = userObject.middle_name;
+    else if (userObject.middle_name === "") user.middle_name = null;
+
     if (userObject.phone_number) user.phone_number = userObject.phone_number;
+    else if (userObject.phone_number === "") user.phone_number = null;
+
     if (userObject.country) user.country = userObject.country;
     await user.save();
 
