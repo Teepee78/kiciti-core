@@ -102,7 +102,6 @@ router.get("/", async (req, res) => {
     const posts_objects = Object.values(posts);
     for (let post of posts_objects) {
       const user = await User.findById(post.user_id.toString());
-      console.log(user);
       result.push({
         post: _.omit(post.toObject(), ["__v"]),
         user: _.omit(user.toObject(), [
