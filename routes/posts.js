@@ -165,6 +165,13 @@ router.get("/:user_id", authenticate, async (req, res) => {
     res.json({
       status: "OK",
       posts: posts,
+      user: _.omit(user.toObject(), [
+        "password",
+        "posts",
+        "created_at",
+        "__v",
+        "likes",
+      ]),
     });
   } catch (error) {
     console.error(error);
