@@ -93,6 +93,7 @@ router.get("/", async (req, res) => {
 
     // Get Posts
     let posts = await Post.find()
+      .sort({ created_at: 1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
