@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import dotenv from "dotenv";
+import fs from 'fs';
 
 dotenv.config();
 
@@ -17,10 +18,10 @@ const s3 = new S3({
 });
 
 async function uploadPfp(user_id, pfp) {
-  const path = `../${pfp.path}`;
+  const path = `./${pfp.path}`;
 	const uploadParams = {
     Bucket: bucket,
-    Body: path,
+    Body: fs.readFileSync(path),
     Key: `pfp-${user_id}.jpg`
   };
 
