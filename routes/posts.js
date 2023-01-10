@@ -5,6 +5,7 @@ import Router from "express";
 import multer from "multer";
 import _ from "lodash";
 import { uploadPostImages } from "../utilities/s3.js";
+import fs from "fs";
 
 const router = Router();
 const upload = multer({ dest: "./uploads" });
