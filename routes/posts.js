@@ -4,7 +4,7 @@ import authenticate from "../middlewares/auth.js";
 import Router from "express";
 import multer from "multer";
 import _ from "lodash";
-import { uploadPostImages } from "../utilities/s3.js";
+import { uploadPostImages, getSignedUrl } from "../utilities/s3.js";
 import fs from "fs";
 
 const router = Router();
@@ -128,8 +128,17 @@ router.get("/", async (req, res) => {
     const posts_objects = Object.values(posts);
     for (let post of posts_objects) {
       const user = await User.findById(post.user_id.toString());
+
+      // Get post images signed url
+      let temp = _.omit(post.toObject(), ["__v"]);
+      if (temp.images) {
+        for (let [i, img] of Object.entries(temp.images)) {
+          temp.images[i] = getSignedUrl(img);
+        }
+      }
+
       result.push({
-        post: _.omit(post.toObject(), ["__v"]),
+        post: temp,
         user: _.omit(user.toObject(), [
           "password",
           "posts",

@@ -63,4 +63,9 @@ async function uploadPostImages(post_id, images) {
   return Promise.all(promises);
 }
 
-export { uploadPfp, downloadPfp, deletePfp, uploadPostImages };
+function getSignedUrl(key) {
+  const params = { Bucket: bucket, Key: key, Expires: 3600 };
+  return s3.getSignedUrl("getObject", params);
+}
+
+export { uploadPfp, downloadPfp, deletePfp, uploadPostImages, getSignedUrl };
