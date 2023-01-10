@@ -1,11 +1,13 @@
 import Post from "../models/posts.js";
 import User from "../models/users.js";
 import authenticate from "../middlewares/auth.js";
-// import _ from "lodash";
 import Router from "express";
+import multer from "multer";
 import _ from "lodash";
+import { uploadPostImages } from "../utilities/s3.js";
 
 const router = Router();
+const upload = multer({ dest: "./uploads" });
 
 /**
  * @openapi
@@ -17,7 +19,7 @@ const router = Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         application/*:
  *           schema:
  *             type: object
  *             properties:
@@ -31,36 +33,51 @@ const router = Router();
  *       "403":
  *         description: Forbidden
  */
-router.post("/", authenticate, async (req, res) => {
-  try {
-    // Get user
-    let user = await User.findById(req.user_id);
+router.post(
+  "/",
+  [authenticate, upload.array("images", 4)],
+  async (req, res) => {
+    try {
+      // Get user
+      let user = await User.findById(req.user_id);
 
-    // Create post
-    let post = await Post({
-      content: req.body.content,
-      user_id: req.user_id,
-    });
-    await post.save();
+      // Create post
+      let post = await Post({
+        content: req.body.content,
+        user_id: req.user_id,
+      });
+      await post.save();
 
-    // Add post id to user posts
-    if (user.posts === undefined) {
-      user.posts = [post._id];
-    } else {
-      user.posts.push(post._id);
+      // Check for images and upload
+      if (req.files) {
+        let images = await uploadPostImages(post.id, req.files);
+
+        // Save images to post
+        for (let i = 0; i < req.files.length; i++) {
+          post.images.push(`post-${post.id}_${i}.jpg`);
+        }
+        await post.save();
+      }
+
+      // Add post id to user posts
+      if (user.posts === undefined) {
+        user.posts = [post._id];
+      } else {
+        user.posts.push(post._id);
+      }
+      await user.save();
+
+      res.json({
+        message: "Post created successfully!",
+        status: "OK",
+        post: _.omit(post.toObject(), ["__v"]),
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(400).json({ message: error.message });
     }
-    await user.save();
-
-    res.json({
-      message: "Post created successfully!",
-      status: "OK",
-      post: _.omit(post.toObject(), ["__v"]),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: error.message });
   }
-});
+);
 
 /**
  * @openapi

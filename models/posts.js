@@ -1,36 +1,46 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const postSchema =  new mongoose.Schema({
-	content: {
+const postSchema = new mongoose.Schema({
+  content: {
     type: String,
     maxLength: 2000,
-    required: true
+    required: true,
   },
 
   created_at: {
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now,
   },
 
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
 
-  likes: [{
-	type: mongoose.Schema.Types.ObjectId,
-	ref: "Like"
-  }],
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Like",
+    },
+  ],
 
-  comments: [{
-	type: mongoose.Schema.Types.ObjectId,
-	ref: "Comment"
-  }]
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+    },
+  ],
+
+  images: [
+    {
+      type: String,
+      maxLength: 50,
+    },
+  ],
 });
-
 
 export default mongoose.model("Post", postSchema);
