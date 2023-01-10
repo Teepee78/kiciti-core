@@ -67,6 +67,13 @@ router.post(
       }
       await user.save();
 
+      // Delete images locally
+      req.files.map((image) => {
+        fs.unlink("./uploads/" + image.filename, (err) => {
+          if (err) throw err;
+        });
+      });
+
       res.json({
         message: "Post created successfully!",
         status: "OK",
