@@ -192,9 +192,19 @@ router.get("/:user_id", authenticate, async (req, res) => {
 
     // Get all posts by user
     let posts = [];
-    for (let post_id of user.posts) {
-      let post = await Post.findById(post_id);
-      posts.push(post);
+    for (let i = user.posts.length - 1; i >= 0; i--) {
+      let post = await Post.findById(user.posts[i]);
+      if (post !== null) {
+        // Get post images signed url
+        let temp = _.omit(post.toObject(), ["__v"]);
+        if (temp.images) {
+          for (let [i, img] of Object.entries(temp.images)) {
+            temp.images[i] = getSignedUrl(img);
+          }
+        }
+
+        posts.push(temp);
+      }
     }
 
     res.json({
